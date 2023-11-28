@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 
@@ -85,5 +86,20 @@ class AnimatedLocationMarkerLayer extends StatelessWidget {
         }
       },
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('position', position))
+      ..add(DiagnosticsProperty('heading', heading))
+      ..add(DiagnosticsProperty('style', style))
+      ..add(DiagnosticsProperty('moveAnimationDuration', moveAnimationDuration))
+      ..add(DiagnosticsProperty('moveAnimationCurve', moveAnimationCurve))
+      ..add(
+        DiagnosticsProperty('rotateAnimationDuration', rotateAnimationDuration),
+      )
+      ..add(DiagnosticsProperty('rotateAnimationCurve', rotateAnimationCurve));
   }
 }

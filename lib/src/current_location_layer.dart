@@ -130,6 +130,46 @@ class CurrentLocationLayer extends StatefulWidget {
 
   @override
   State<CurrentLocationLayer> createState() => _CurrentLocationLayerState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('style', style))
+      ..add(DiagnosticsProperty('positionStream', positionStream))
+      ..add(DiagnosticsProperty('headingStream', headingStream))
+      ..add(DiagnosticsProperty('followScreenPoint', followScreenPoint))
+      ..add(
+        DiagnosticsProperty('followScreenPointOffset', followScreenPointOffset),
+      )
+      ..add(
+        DiagnosticsProperty(
+          'followCurrentLocationStream',
+          followCurrentLocationStream,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          'turnHeadingUpLocationStream',
+          turnHeadingUpLocationStream,
+        ),
+      )
+      ..add(EnumProperty('followOnLocationUpdate', followOnLocationUpdate))
+      ..add(EnumProperty('turnOnHeadingUpdate', turnOnHeadingUpdate))
+      ..add(
+        DiagnosticsProperty('followAnimationDuration', followAnimationDuration),
+      )
+      ..add(DiagnosticsProperty('followAnimationCurve', followAnimationCurve))
+      ..add(DiagnosticsProperty('turnAnimationDuration', turnAnimationDuration))
+      ..add(DiagnosticsProperty('turnAnimationCurve', turnAnimationCurve))
+      ..add(DiagnosticsProperty('moveAnimationDuration', moveAnimationDuration))
+      ..add(DiagnosticsProperty('moveAnimationCurve', moveAnimationCurve))
+      ..add(
+        DiagnosticsProperty('rotateAnimationDuration', rotateAnimationDuration),
+      )
+      ..add(DiagnosticsProperty('rotateAnimationCurve', rotateAnimationCurve))
+      ..add(DiagnosticsProperty('indicators', indicators));
+  }
 }
 
 class _CurrentLocationLayerState extends State<CurrentLocationLayer>
@@ -623,6 +663,68 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     });
 
     return _rotateMapAnimationController!.forward();
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(EnumProperty('_status', _status))
+      ..add(DiagnosticsProperty('_currentPosition', _currentPosition))
+      ..add(DiagnosticsProperty('_currentHeading', _currentHeading))
+      ..add(DoubleProperty('_followingZoom', _followingZoom))
+      ..add(
+        DiagnosticsProperty('_isFirstLocationUpdate', _isFirstLocationUpdate),
+      )
+      ..add(DiagnosticsProperty('_isFirstHeadingUpdate', _isFirstHeadingUpdate))
+      ..add(
+        DiagnosticsProperty(
+          '_positionStreamSubscription',
+          _positionStreamSubscription,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_headingStreamSubscription',
+          _headingStreamSubscription,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_followCurrentLocationStreamSubscription',
+          _followCurrentLocationStreamSubscription,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_turnHeadingUpStreamSubscription',
+          _turnHeadingUpStreamSubscription,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_moveMapAnimationController',
+          _moveMapAnimationController,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_moveMarkerAnimationController',
+          _moveMarkerAnimationController,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_rotateMapAnimationController',
+          _rotateMapAnimationController,
+        ),
+      )
+      ..add(
+        DiagnosticsProperty(
+          '_rotateMarkerAnimationController',
+          _rotateMarkerAnimationController,
+        ),
+      );
   }
 }
 
