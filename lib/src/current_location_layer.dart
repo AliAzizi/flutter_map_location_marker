@@ -327,22 +327,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer> with Ticker
           widget.onPositionChanged?.call(position);
           _moveMarker(position);
 
-          bool followCurrentLocation;
-          switch (widget.followOnLocationUpdate) {
-            case FollowOnLocationUpdate.always:
-              followCurrentLocation = true;
-            case FollowOnLocationUpdate.once:
-              followCurrentLocation = _isFirstLocationUpdate;
-              _isFirstLocationUpdate = false;
-            case FollowOnLocationUpdate.never:
-              followCurrentLocation = false;
-          }
-          if (followCurrentLocation) {
-            _moveMap(
-              position.latLng,
-              _followingZoom,
-            );
-          }
         }
       },
       onError: (error) {
