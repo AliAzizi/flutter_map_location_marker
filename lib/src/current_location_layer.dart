@@ -163,7 +163,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer> with Ticker
     _isFirstHeadingUpdate = true;
     _subscriptPositionStream();
     _subscriptHeadingStream();
-    _subscriptFollowCurrentLocationStream();
     _subscriptTurnHeadingUpStream();
   }
 
@@ -178,10 +177,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer> with Ticker
       _headingStreamSubscription.cancel();
       _subscriptHeadingStream();
     }
-    if (widget.followCurrentLocationStream != oldWidget.followCurrentLocationStream) {
-      _followCurrentLocationStreamSubscription?.cancel();
-      _subscriptFollowCurrentLocationStream();
-    }
+
     if (widget.turnHeadingUpLocationStream != oldWidget.turnHeadingUpLocationStream) {
       _turnHeadingUpStreamSubscription?.cancel();
       _subscriptTurnHeadingUpStream();
@@ -326,7 +322,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer> with Ticker
           }
           widget.onPositionChanged?.call(position);
           _moveMarker(position);
-
         }
       },
       onError: (error) {
@@ -375,18 +370,6 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer> with Ticker
         }
       },
     );
-  }
-
-  void _subscriptFollowCurrentLocationStream() {
-    _followCurrentLocationStreamSubscription = widget.followCurrentLocationStream?.listen((double? zoom) {
-      if (_currentPosition != null) {
-        _followingZoom = zoom;
-        _moveMap(
-          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          zoom,
-        ).whenComplete(() => _followingZoom = null);
-      }
-    });
   }
 
   void _subscriptTurnHeadingUpStream() {
