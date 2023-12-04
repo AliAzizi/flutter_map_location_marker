@@ -101,6 +101,8 @@ class CurrentLocationLayer extends StatefulWidget {
   /// The indicators which will display when in special status.
   final LocationMarkerIndicators indicators;
 
+  final ValueChanged<LocationMarkerPosition>? onPositionChanged;
+
   /// Create a CurrentLocationLayer.
   CurrentLocationLayer({
     super.key,
@@ -122,18 +124,15 @@ class CurrentLocationLayer extends StatefulWidget {
     this.rotateAnimationDuration = const Duration(milliseconds: 200),
     this.rotateAnimationCurve = Curves.easeInOut,
     this.indicators = const LocationMarkerIndicators(),
-  })  : positionStream = positionStream ??
-            const LocationMarkerDataStreamFactory()
-                .fromGeolocatorPositionStream(),
-        headingStream = headingStream ??
-            const LocationMarkerDataStreamFactory().fromCompassHeadingStream();
+    this.onPositionChanged,
+  })  : positionStream = positionStream ?? const LocationMarkerDataStreamFactory().fromGeolocatorPositionStream(),
+        headingStream = headingStream ?? const LocationMarkerDataStreamFactory().fromCompassHeadingStream();
 
   @override
   State<CurrentLocationLayer> createState() => _CurrentLocationLayerState();
 }
 
-class _CurrentLocationLayerState extends State<CurrentLocationLayer>
-    with TickerProviderStateMixin {
+class _CurrentLocationLayerState extends State<CurrentLocationLayer> with TickerProviderStateMixin {
   _Status _status = _Status.initialing;
   LocationMarkerPosition? _currentPosition;
   LocationMarkerHeading? _currentHeading;
@@ -179,13 +178,11 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
       _headingStreamSubscription.cancel();
       _subscriptHeadingStream();
     }
-    if (widget.followCurrentLocationStream !=
-        oldWidget.followCurrentLocationStream) {
+    if (widget.followCurrentLocationStream != oldWidget.followCurrentLocationStream) {
       _followCurrentLocationStreamSubscription?.cancel();
       _subscriptFollowCurrentLocationStream();
     }
-    if (widget.turnHeadingUpLocationStream !=
-        oldWidget.turnHeadingUpLocationStream) {
+    if (widget.turnHeadingUpLocationStream != oldWidget.turnHeadingUpLocationStream) {
       _turnHeadingUpStreamSubscription?.cancel();
       _subscriptTurnHeadingUpStream();
     }
@@ -327,6 +324,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
               _status = _Status.ready;
             });
           }
+          widget.onPositionChanged?.call(position);
           _moveMarker(position);
 
           bool followCurrentLocation;
@@ -396,8 +394,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
   }
 
   void _subscriptFollowCurrentLocationStream() {
-    _followCurrentLocationStreamSubscription =
-        widget.followCurrentLocationStream?.listen((double? zoom) {
+    _followCurrentLocationStreamSubscription = widget.followCurrentLocationStream?.listen((double? zoom) {
       if (_currentPosition != null) {
         _followingZoom = zoom;
         _moveMap(
@@ -409,8 +406,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
   }
 
   void _subscriptTurnHeadingUpStream() {
-    _turnHeadingUpStreamSubscription =
-        widget.turnHeadingUpLocationStream?.listen((_) {
+    _turnHeadingUpStreamSubscription = widget.turnHeadingUpLocationStream?.listen((_) {
       if (_currentHeading != null) {
         _rotateMap(-_currentHeading!.heading % (2 * pi));
       }
@@ -437,8 +433,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     });
 
     _moveMarkerAnimationController!.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
         _moveMarkerAnimationController!.dispose();
         _moveMarkerAnimationController = null;
       }
@@ -452,14 +447,12 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     zoom ??= map.zoom;
 
     final LatLng beginLatLng;
-    if (widget.followScreenPoint == _originPoint &&
-        widget.followScreenPointOffset == _originPoint) {
+    if (widget.followScreenPoint == _originPoint && widget.followScreenPointOffset == _originPoint) {
       beginLatLng = map.center;
     } else {
       final crs = map.options.crs;
       final followOffset =
-          (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) +
-              widget.followScreenPointOffset;
+          (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) + widget.followScreenPointOffset;
       final mapCenter = crs.latLngToPoint(map.center, map.zoom);
       final followPoint = map.rotatePoint(mapCenter, mapCenter + followOffset);
       beginLatLng = crs.pointToLatLng(followPoint, map.zoom);
@@ -495,14 +488,12 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
       final evaluatedZoom = zoomTween.evaluate(animation);
 
       final LatLng mapCenter;
-      if (widget.followScreenPoint == _originPoint &&
-          widget.followScreenPointOffset == _originPoint) {
+      if (widget.followScreenPoint == _originPoint && widget.followScreenPointOffset == _originPoint) {
         mapCenter = evaluatedLatLng;
       } else {
         final crs = map.options.crs;
         final followOffset =
-            (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) +
-                widget.followScreenPointOffset;
+            (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) + widget.followScreenPointOffset;
         final followPoint = crs.latLngToPoint(evaluatedLatLng, evaluatedZoom);
         final mapCenterPoint = map.rotatePoint(
           followPoint,
@@ -519,8 +510,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     });
 
     _moveMapAnimationController!.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
         _moveMapAnimationController!.dispose();
         _moveMapAnimationController = null;
       }
@@ -550,10 +540,8 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
       }
     });
 
-    _rotateMarkerAnimationController!
-        .addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
+    _rotateMarkerAnimationController!.addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
         _rotateMarkerAnimationController!.dispose();
         _rotateMarkerAnimationController = null;
       }
@@ -583,8 +571,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     );
 
     _rotateMapAnimationController!.addListener(() {
-      if (widget.followScreenPoint == _originPoint &&
-          widget.followScreenPointOffset == _originPoint) {
+      if (widget.followScreenPoint == _originPoint && widget.followScreenPointOffset == _originPoint) {
         map.rotate(
           angleTween.evaluate(animation) / pi * 180,
           source: MapEventSource.mapController,
@@ -592,11 +579,9 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
       } else {
         final crs = map.options.crs;
         final followOffset =
-            (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) +
-                widget.followScreenPointOffset;
+            (map.nonrotatedSize * 0.5).scaleBy(widget.followScreenPoint) + widget.followScreenPointOffset;
         final mapCenter = crs.latLngToPoint(map.center, map.zoom);
-        final followPoint =
-            map.rotatePoint(mapCenter, mapCenter + followOffset);
+        final followPoint = map.rotatePoint(mapCenter, mapCenter + followOffset);
         map.rotate(
           angleTween.evaluate(animation) / pi * 180,
           source: MapEventSource.mapController,
@@ -615,8 +600,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
     });
 
     _rotateMapAnimationController!.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
         _rotateMapAnimationController!.dispose();
         _rotateMapAnimationController = null;
       }
